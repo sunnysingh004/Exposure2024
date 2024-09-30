@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            width: 50%;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-section, .tracker-section {
+            margin-bottom: 30px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        form input, form select, form button {
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        form button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        form button:hover {
+            background-color: #218838;
+        }
+        #tracker {
+            padding: 10px;
+        }
+        .event {
+            margin-bottom: 20px;
+        }
+        .event h3 {
+            margin-bottom: 10px;
+        }
+        .participants {
+            margin-left: 20px;
+        }
+        .participants li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Event Registration Tracker</h1>
+
+        <!-- Form for adding a new event -->
+        <div class="form-section">
+            <h2>Add Event</h2>
+            <form id="event-form">
+                <input type="text" id="event-name" placeholder="Event Name" required>
+                <input type="date" id="event-date" required>
+                <button type="submit">Add Event</button>
+            </form>
+        </div>
+
+        <!-- Form for registering participants -->
+        <div class="form-section">
+            <h2>Register Participant</h2>
+            <form id="registration-form">
+                <input type="text" id="participant-name" placeholder="Participant Name" required>
+                <select id="event-select">
+                    <option value="">Select Event</option>
+                </select>
+                <button type="submit">Register</button>
+            </form>
+        </div>
+
+        <!-- Event Tracker Section -->
+        <div class="tracker-section">
+            <h2>Event Tracker</h2>
+            <div id="tracker"></div>
+        </div>
+    </div>
+
+    <script>
+        // Array to store events
+        let events = [];
+
+        // Array to store participants
+        let registrations = [];
+
+        // DOM Elements
+        const eventForm = document.getElementById('event-form');
+        const registrationForm = document.getElementById('registration-form');
+        const eventSelect = document.getElementById('event-select');
+        const tracker = document.getElementById('tracker');
+
+        // Function to render event options in the select dropdown
+        function renderEventOptions() {
+            eventSelect.innerHTML = '<option value="">Select Event</option>';
+            events.forEach(event => {
+                const option = document.createElement('option');
+                option.value = event.name;
+                option.textContent = event.name;
+                eventSelect.appendChild(option);
+            });
+        }
+
+        // Function to render the tracker
+        function renderTracker() {
+            tracker.innerHTML = '';
+            events.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.classList.add('event');
+
+                const eventHeader = document.createElement('h3');
+                eventHeader.textContent = ${event.name} (${event.date});
+                eventDiv.appendChild(eventHeader);
+
+                const participantsList = document.createElement('ul');
+                participantsList.classList.add('participants');
+
+                const eventRegistrations = registrations.filter(reg => reg.event === event.name);
+                eventRegistrations.forEach(reg => {
+                    const participantItem = document.createElement('li');
+                    participantItem.textContent = reg.participant;
+                    participantsList.appendChild(participantItem);
+                });
+
+                eventDiv.appendChild(participantsList);
+                tracker.appendChild(eventDiv);
+            });
+        }
+
+        // Event listener for adding a new event
+        eventForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const eventName = document.getElementById('event-name').value;
+            const eventDate = document.getElementById('event-date').value;
+
+            const newEvent = { name: eventName, date: eventDate };
+            events.push(newEvent);
+
+            // Clear form
+            document.getElementById('event-name').value = '';
+            document.getElementById('event-date').value = '';
+
+            renderEventOptions();
+            renderTracker();
+        });
+
+        // Event listener for registering a participant
+        registrationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const participantName = document.getElementById('participant-name').value;
+            const selectedEvent = eventSelect.value;
+
+            if (selectedEvent === '') {
+                alert('Please select an event!');
+                return;
+            }
+
+            const newRegistration = { participant: participantName, event: selectedEvent };
+            registrations.push(newRegistration);
+
+            // Clear form
+            document.getElementById('participant-name').value = '';
+            eventSelect.value = '';
+
+            renderTracker();
+        });
+
+        // Initial rendering of tracker
+        renderTracker();
+    </script>
+</body>
+</html>
